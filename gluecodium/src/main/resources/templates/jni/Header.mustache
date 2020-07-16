@@ -28,13 +28,21 @@
 extern "C" {
 #endif
 
-{{#container}}{{#methods}}
-JNIEXPORT {{returnType.name}} JNICALL
+{{#container}}{{#functions}}
+JNIEXPORT {{#ifPredicate "returnsOpaqueHandle"}}jlong{{/ifPredicate}}{{!!
+}}{{#unlessPredicate "returnsOpaqueHandle"}}{{resolveName returnType}}{{/unlessPredicate}} JNICALL
 {{>jni/FunctionSignature}};
-
-{{/methods}}
+{{/functions}}
+{{#properties}}{{#set property=this}}{{#getter}}
+JNIEXPORT {{resolveName returnType}} JNICALL
+Java_{{resolveName container "mangled"}}_{{resolveName property "" "getter"}}(JNIEnv* _jenv, jobject _jinstance);
+{{/getter}}{{#setter}}
+JNIEXPORT void JNICALL
+Java_{{resolveName container "mangled"}}_{{resolveName property "" "setter"}}(JNIEnv* _jenv, jobject _jinstance{{!!
+}}{{#parameters}}, {{resolveName typeRef}} j{{resolveName}}{{/parameters}});
+{{/setter}}{{/set}}{{/properties}}
 {{#if hasInterfaceParent}}{{#parentMethods}}
-JNIEXPORT {{returnType.name}} JNICALL
+JNIEXPORT {{resolveName returnType}} JNICALL
 {{>jni/FunctionSignature}};
 
 {{/parentMethods}}{{/if}}

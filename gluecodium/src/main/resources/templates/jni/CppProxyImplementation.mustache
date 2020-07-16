@@ -34,16 +34,16 @@ namespace jni
 {
 
 {{#container}}
-{{mangledName}}_CppProxy::{{mangledName}}_CppProxy( JNIEnv* _jenv, JniReference<jobject> globalRef, jint _jHashCode )
-    : CppProxyBase( _jenv, std::move( globalRef ), _jHashCode, "{{mangledName}}" ) {
+{{resolveName "mangled"}}_CppProxy::{{resolveName "mangled"}}_CppProxy( JNIEnv* _jenv, JniReference<jobject> globalRef, jint _jHashCode )
+    : CppProxyBase( _jenv, std::move( globalRef ), _jHashCode, "{{resolveName "mangled"}}" ) {
 }
 {{#parentMethods}}
 {{>proxyMethod}}
 {{/parentMethods}}{{!!
 
-}}{{#methods}}
+}}{{#functions}}
 {{>proxyMethod}}
-{{/methods}}
+{{/functions}}
 {{/container}}
 
 }
@@ -52,21 +52,24 @@ namespace jni
 {{/internalNamespace}}{{!!
 
 }}{{+proxyMethod}}
-{{returnType.cppName}}
-{{mangledName}}_CppProxy::{{cppMethodName}}( {{joinPartial parameters "jni/CppProxyMethodParameter" ", "}} ){{#if isConst}} const{{/if}} {
+{{resolveName returnType "C++"}}
+{{resolveName container "mangled"}}_CppProxy::{{#instanceOf container "LimeLambda"}}operator(){{/instanceOf}}{{!!
+}}{{#notInstanceOf container "LimeLambda"}}{{resolveName "C++"}}{{/notInstanceOf}}( {{#parameters}}{{!!
+}}const {{resolveName typeRef "C++"}}{{#ifPredicate typeRef "needsRefSuffix"}}&{{/ifPredicate}} n{{resolveName}}{{#if iter.hasNext}}, {{/if}}{{!!
+}}{{/parameters}} ){{#if attributes.cpp.const}} const{{/if}} {
     JNIEnv* jniEnv = getJniEnvironment( );{{!!
 }}{{#parameters}}{{!!
-}}{{#if type.isComplex}}
-    auto j{{name}} = convert_to_jni( jniEnv, n{{name}} );{{!!
-}}{{/if}}{{!!
-}}{{#unless type.isComplex}}
-    j{{type.javaName}} j{{name}} = n{{name}};{{!!
-}}{{/unless}}{{!!
+}}{{#unlessPredicate typeRef "isJniPrimitive"}}
+    auto j{{resolveName}} = convert_to_jni( jniEnv, n{{resolveName}} );{{!!
+}}{{/unlessPredicate}}{{#ifPredicate typeRef "isJniPrimitive"}}
+    {{resolveName typeRef}} j{{resolveName}} = n{{resolveName}};{{!!
+}}{{/ifPredicate}}{{!!
 }}{{/parameters}}
-    {{#unless returnType.isJavaVoid}}auto result = {{/unless}}callJavaMethod<{{returnType.name}}>( "{{javaMethodName}}", {{!!
-    }}"({{#parameters}}{{type.jniTypeSignature}}{{/parameters}}){{returnType.jniTypeSignature}}", {{!!
-    }}jniEnv {{#if parameters}},{{/if}} {{#parameters}}j{{name}}{{#if iter.hasNext}}, {{/if}}{{/parameters}});
-{{#exception}}
+    {{#unless returnType.isJavaVoid}}auto result = {{/unless}}callJavaMethod<{{resolveName returnType}}>( {{!!
+    }}"{{resolveName}}", "({{#parameters}}{{resolveName typeRef "signature"}}{{/parameters}}){{!!
+    }}{{resolveName returnType "signature"}}", jniEnv {{#if parameters}},{{/if}} {{!!
+    }}{{#parameters}}j{{resolveName}}{{#if iter.hasNext}}, {{/if}}{{/parameters}});
+{{#if thrownType}}
     auto jException = make_local_ref<jobject>(jniEnv, jniEnv->ExceptionOccurred( ));
     if ( jException )
     {
@@ -75,22 +78,21 @@ namespace jni
             jniEnv,
             jException,
             "error",
-            "{{errorType.jniTypeSignature}}" );
+            "{{resolveName exception.errorType "signature"}}" );
         auto nErrorValue = convert_from_jni(
             jniEnv,
             jErrorValue,
-            ({{errorType.cppFullyQualifiedName}}*)nullptr );
+            ({{resolveName exception.errorType "C++ FQN"}}*)nullptr );
 
-{{#if cppTypeIsErrorCode}}
+{{#instanceOf exception.errorType.type.actualType "LimeEnumeration"}}
         return ::std::error_code{nErrorValue};
-{{/if}}{{#unless cppTypeIsErrorCode}}
-        return {{errorType.cppFullyQualifiedName}}{nErrorValue};
-{{/unless}}
+{{/instanceOf}}{{#notInstanceOf exception.errorType.type.actualType "LimeEnumeration"}}
+        return {{resolveName exception.errorType "C++ FQN"}}{nErrorValue};
+{{/notInstanceOf}}
     }
     else
     {
-{{/exception}}{{!!
-}}{{^exception}}
+{{/if}}{{#unless thrownType}}
     if ( jniEnv->ExceptionCheck( ) )
     {
         jniEnv->ExceptionDescribe( );
@@ -98,17 +100,18 @@ namespace jni
         jniEnv->FatalError( "Exception was thrown in Java and it was not handled.\n"
             "See the log for more information about the exception (including Java stack trace)." );
     }
-{{/exception}}{{!!
+{{/unless}}{{!!
 }}{{#unless returnType.isJavaVoid}}
-    return {{#if returnType.isComplex}}convert_from_jni( jniEnv, result, ({{returnType.cppName}}{{#if exception}}::value_type{{/if}}*)nullptr ){{/if}}{{!!
-    }}{{#unless returnType.isComplex}}result{{/unless}};
+    return {{#unlessPredicate returnType.typeRef "isJniPrimitive"}}convert_from_jni( jniEnv, result, {{!!
+    }}({{resolveName returnType "C++"}}{{#if thrownType}}::value_type{{/if}}*)nullptr ){{/unlessPredicate}}{{!!
+    }}{{#ifPredicate returnType.typeRef "isJniPrimitive"}}result{{/ifPredicate}};
 {{/unless}}
-{{#exception}}{{#if returnType.isJavaVoid}}{{#if cppTypeIsErrorCode}}
+{{#if thrownType}}{{#if returnType.isJavaVoid}}{{#instanceOf exception.errorType.type.actualType "LimeEnumeration"}}
         return ::std::error_code{};
-{{/if}}{{#unless exception.cppTypeIsErrorCode}}
+{{/instanceOf}}{{#notInstanceOf exception.errorType.type.actualType "LimeEnumeration"}}
         return {true};
-{{/unless}}{{/if}}
+{{/notInstanceOf}}{{/if}}
     }
-{{/exception}}
+{{/if}}
 }
 {{/proxyMethod}}

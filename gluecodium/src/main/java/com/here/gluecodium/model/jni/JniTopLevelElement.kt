@@ -19,7 +19,7 @@
 
 package com.here.gluecodium.model.jni
 
-import com.here.gluecodium.generator.jni.JniNameRules
+import com.here.gluecodium.generator.jni.JniFileNameRules
 import com.here.gluecodium.model.java.JavaPackage
 
 abstract class JniTopLevelElement(
@@ -33,5 +33,5 @@ abstract class JniTopLevelElement(
 ) : JniElement {
     @Suppress("MemberVisibilityCanBePrivate")
     val fullJavaName = (javaPackage.packageNames + javaName).joinToString("/")
-    open val mangledName = JniNameRules.getMangledName(fullJavaName)
+    open val mangledName = JniFileNameRules.getMangledName(fullJavaName)
 }

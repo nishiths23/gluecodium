@@ -20,7 +20,7 @@
 package com.here.gluecodium.model.jni
 
 import com.here.gluecodium.cli.GluecodiumExecutionException
-import com.here.gluecodium.generator.jni.JniNameRules
+import com.here.gluecodium.generator.jni.JniFileNameRules
 import com.here.gluecodium.generator.jni.JniTypeNameMapper
 import com.here.gluecodium.model.common.Include
 import com.here.gluecodium.model.cpp.CppComplexTypeRef
@@ -59,7 +59,7 @@ class JniType(
 
     @Suppress("unused")
     val mangledSignature: String
-        get() = JniNameRules.getMangledName(jniTypeSignature)
+        get() = JniFileNameRules.getMangledName(jniTypeSignature)
 
     companion object {
         val VOID = JniType(JavaPrimitiveTypeRef.VOID, CppPrimitiveTypeRef.VOID)

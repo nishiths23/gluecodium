@@ -19,7 +19,7 @@
 
 package com.here.gluecodium.model.jni
 
-import com.here.gluecodium.generator.jni.JniNameRules
+import com.here.gluecodium.generator.jni.JniFileNameRules
 import com.here.gluecodium.model.common.Include
 import com.here.gluecodium.model.java.JavaPackage
 
@@ -56,7 +56,7 @@ class JniContainer(
     @Suppress("unused")
     val fullJavaName = (javaPackage.packageNames + javaNames.joinToString("$")).joinToString("/")
     @Suppress("unused")
-    val mangledName = JniNameRules.getMangledName(fullJavaName)
+    val mangledName = JniFileNameRules.getMangledName(fullJavaName)
 
     enum class ContainerType {
         TYPE_COLLECTION,

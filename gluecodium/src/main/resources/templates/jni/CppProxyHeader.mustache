@@ -35,18 +35,21 @@ namespace {{.}}
 namespace jni
 {
 
-class {{mangledName}}_CppProxy : public CppProxyBase{{#unless isFunctionalInterface}}, public {{cppFullyQualifiedName}}{{/unless}} {
+class {{resolveName "mangled"}}_CppProxy : public CppProxyBase{{!!
+}}{{#instanceOf this "LimeInterface"}}, public {{resolveName "C++ FQN"}}{{/instanceOf}} {
 public:
-    {{mangledName}}_CppProxy( JNIEnv* _jenv, JniReference<jobject> globalRef, jint _jHashCode );
-    {{mangledName}}_CppProxy( const {{mangledName}}_CppProxy& ) = delete;
-    {{mangledName}}_CppProxy& operator=( const {{mangledName}}_CppProxy& ) = delete;
+    {{resolveName "mangled"}}_CppProxy( JNIEnv* _jenv, JniReference<jobject> globalRef, jint _jHashCode );
+    {{resolveName "mangled"}}_CppProxy( const {{resolveName "mangled"}}_CppProxy& ) = delete;
+    {{resolveName "mangled"}}_CppProxy& operator=( const {{resolveName "mangled"}}_CppProxy& ) = delete;
 
 {{#parentMethods}}
-    {{returnType.cppName}} {{cppMethodName}}( {{joinPartial parameters "jni/CppProxyMethodParameter" ", "}} ){{#if isConst}} const{{/if}} override;
+    {{resolveName returnType "C++"}} {{resolveName "C++"}}( {{!!
+    }}{{joinPartial parameters "jni/CppProxyMethodParameter" ", "}} ){{#if attributes.cpp.const}} const{{/if}} override;
 {{/parentMethods}}
 {{#methods}}
-    {{returnType.cppName}} {{cppMethodName}}( {{joinPartial parameters "jni/CppProxyMethodParameter" ", "}} ){{!!
-}}{{#if isConst}} const{{/if}}{{#unless isFunctionalInterface}} override{{/unless}};
+    {{resolveName returnType "C++"}} {{resolveName "C++"}}( {{!!
+    }}{{joinPartial parameters "jni/CppProxyMethodParameter" ", "}} ){{!!
+    }}{{#if attributes.cpp.const}} const{{/if}}{{#instanceOf this "LimeInterface"}} override{{/instanceOf}};
 {{/methods}}
 };
 

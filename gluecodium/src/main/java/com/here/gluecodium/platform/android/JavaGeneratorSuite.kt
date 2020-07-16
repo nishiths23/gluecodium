@@ -80,11 +80,8 @@ open class JavaGeneratorSuite protected constructor(
             basePackages = javaPackageList,
             internalPackageList = internalPackage,
             enableAndroidFeatures = enableAndroidFeatures,
-            internalNamespace = internalNamespace,
-            rootNamespace = rootNamespace,
             nonNullAnnotation = nonNullAnnotation,
             nullableAnnotation = nullableAnnotation,
-            cppNameRules = cppNameRules,
             javaNameRules = javaNameRules
         )
 
@@ -129,8 +126,16 @@ open class JavaGeneratorSuite protected constructor(
             headers += androidManifestGenerator.generate()
         }
 
-        val jniTemplates =
-            JniTemplates(javaPackageList, internalPackage, internalNamespace, generatorName)
+        val jniTemplates = JniTemplates(
+            limeReferenceMap = limeModel.referenceMap,
+            javaNameRules = javaNameRules,
+            basePackages = javaPackageList,
+            internalPackages = internalPackage,
+            internalNamespace = internalNamespace,
+            cppNameRules = cppNameRules,
+            rootNamespace = rootNamespace,
+            generatorName = generatorName
+        )
         for (fileName in UTILS_FILES) {
             headers += jniTemplates.generateConversionUtilsHeaderFile(fileName)
             headers += jniTemplates.generateConversionUtilsImplementationFile(fileName)
@@ -140,8 +145,8 @@ open class JavaGeneratorSuite protected constructor(
         }
 
         return headers + javaFiles +
-                combinedModel.jniContainers.flatMap { jniTemplates.generateFiles(it) } +
-                jniTemplates.generateConversionFiles(combinedModel)
+                limeModel.topElements.flatMap { jniTemplates.generateFiles(it) } +
+                jniTemplates.generateConversionFiles(limeModel.topElements)
     }
 
     private fun processCommentLinks(

@@ -25,7 +25,8 @@ import com.here.gluecodium.generator.cpp.CppIncludeResolver
 import com.here.gluecodium.generator.cpp.CppModelBuilder
 import com.here.gluecodium.generator.java.JavaModelBuilder
 import com.here.gluecodium.generator.java.JavaSignatureResolver
-import com.here.gluecodium.generator.jni.JniNameRules.Companion.getMangledName
+import com.here.gluecodium.generator.jni.JniFileNameRules.Companion.getMangledName
+import com.here.gluecodium.model.common.Include
 import com.here.gluecodium.model.cpp.CppClass
 import com.here.gluecodium.model.cpp.CppEnum
 import com.here.gluecodium.model.cpp.CppEnumItem
@@ -184,22 +185,22 @@ class JniModelBuilder(
         val jniException = if (limeErrorTypeRef != null) {
             val javaExceptionType = javaMethod.exception!!
             val limeErrorTypeIsEnum = limeErrorTypeRef.type.actualType is LimeEnumeration
-            val conversionIncludes = JniIncludeResolver.getConversionIncludes(
+            val conversionIncludes = emptyList<Include>() /* JniIncludeResolver.getConversionIncludes(
                 limeErrorTypeRef,
                 javaExceptionType.errorType
-            )
+            ) */
             JniException(
-                javaClassName = JniNameRules.getFullClassName(javaExceptionType),
+                javaClassName = JniFileNameRules.getFullClassName(javaExceptionType),
                 errorType =
                     JniType(javaExceptionType.errorType, cppMethod.errorType!!, conversionIncludes),
                 cppTypeIsErrorCode = limeErrorTypeIsEnum
             )
         } else null
 
-        val conversionIncludes = JniIncludeResolver.getConversionIncludes(
+        val conversionIncludes = emptyList<Include>() /* JniIncludeResolver.getConversionIncludes(
             limeMethod.returnType.typeRef,
             javaMethod.returnType
-        )
+        ) */
         val jniMethod = JniMethod(
             javaMethodName = getMangledName(javaMethod.name),
             cppMethodName = cppMethod.name,
@@ -222,7 +223,7 @@ class JniModelBuilder(
         val jniType = JniType(
             javaParameter.type,
             cppParameter.type,
-            JniIncludeResolver.getConversionIncludes(limeParameter.typeRef, javaParameter.type)
+            emptyList<Include>() //JniIncludeResolver.getConversionIncludes(limeParameter.typeRef, javaParameter.type)
         )
 
         storeResult(JniParameter(javaParameter.name, jniType))
@@ -234,9 +235,9 @@ class JniModelBuilder(
         val cppStruct = cppBuilder.getFinalResult(CppStruct::class.java)
 
         val externalConverter =
-            limeStruct.external?.java?.get(CONVERTER_NAME)?.let { JniNameRules.getFullClassName(it) }
+            limeStruct.external?.java?.get(CONVERTER_NAME)?.let { JniFileNameRules.getFullClassName(it) }
         val externalConvertedType = limeStruct.external?.java?.get(NAME_NAME)
-            ?.takeIf { externalConverter != null }?.let { JniNameRules.getFullClassName(it) }
+            ?.takeIf { externalConverter != null }?.let { JniFileNameRules.getFullClassName(it) }
 
         val jniStruct = JniStruct(
             javaName = javaClass.classNames.joinToString("$"),
@@ -261,7 +262,7 @@ class JniModelBuilder(
             type = getPreviousResult(JniType::class.java),
             javaName = javaField.name,
             javaCustomType =
-                (javaField.type as? JavaCustomTypeRef)?.let { JniNameRules.getFullClassName(it) },
+                (javaField.type as? JavaCustomTypeRef)?.let { JniFileNameRules.getFullClassName(it) },
             cppField = cppField,
             cppGetterName = cppField.getterName,
             cppSetterName = cppField.setterName,
@@ -278,9 +279,9 @@ class JniModelBuilder(
         val cppEnum = cppBuilder.getFinalResult(CppEnum::class.java)
 
         val externalConverter =
-            limeEnumeration.external?.java?.get(CONVERTER_NAME)?.let { JniNameRules.getFullClassName(it) }
+            limeEnumeration.external?.java?.get(CONVERTER_NAME)?.let { JniFileNameRules.getFullClassName(it) }
         val externalConvertedType = limeEnumeration.external?.java?.get(NAME_NAME)
-            ?.takeIf { externalConverter != null }?.let { JniNameRules.getFullClassName(it) }
+            ?.takeIf { externalConverter != null }?.let { JniFileNameRules.getFullClassName(it) }
 
         val jniEnum = JniEnum(
             javaName = javaEnum.classNames.joinToString("$"),
@@ -320,7 +321,7 @@ class JniModelBuilder(
                 returnType = JniType(
                     javaGetter.returnType,
                     cppGetter.returnType,
-                    JniIncludeResolver.getConversionIncludes(getterTypeRef, javaGetter.returnType)
+                    emptyList<Include>() //JniIncludeResolver.getConversionIncludes(getterTypeRef, javaGetter.returnType)
                 ),
                 isConst = true,
                 isStatic = limeProperty.isStatic
@@ -343,7 +344,7 @@ class JniModelBuilder(
             val parameterType = JniType(
                 javaParameter.type,
                 cppParameter.type,
-                JniIncludeResolver.getConversionIncludes(setterTypeRef, javaParameter.type)
+                emptyList<Include>() //JniIncludeResolver.getConversionIncludes(setterTypeRef, javaParameter.type)
             )
             jniSetter.parameters.add(JniParameter(javaParameter.name, parameterType))
 
@@ -380,14 +381,14 @@ class JniModelBuilder(
             returnType = JniType(
                 javaMethod.returnType,
                 cppFunctionRef.returnType,
-                JniIncludeResolver.getConversionIncludes(limeReturnType, javaMethod.returnType)
+                emptyList<Include>() //JniIncludeResolver.getConversionIncludes(limeReturnType, javaMethod.returnType)
             ),
             parameters = javaMethod.parameters.mapIndexed { index, it ->
                 val limeTypeRef = limeLambda.parameters[index].typeRef
                 val jniType = JniType(
                     it.type,
                     cppFunctionRef.parameters[index],
-                    JniIncludeResolver.getConversionIncludes(limeTypeRef, it.type)
+                    emptyList<Include>() //JniIncludeResolver.getConversionIncludes(limeTypeRef, it.type)
                 )
                 JniParameter(it.name, jniType)
             }.toMutableList()
@@ -400,7 +401,7 @@ class JniModelBuilder(
     override fun finishBuilding(limeTypeRef: LimeTypeRef) {
         val javaType = javaBuilder.getFinalResult(JavaTypeRef::class.java)
         val cppType = cppBuilder.getFinalResult(CppTypeRef::class.java)
-        val conversionIncludes = JniIncludeResolver.getConversionIncludes(limeTypeRef, javaType)
+        val conversionIncludes = emptyList<Include>() //JniIncludeResolver.getConversionIncludes(limeTypeRef, javaType)
         val jniType = JniType(javaType, cppType, conversionIncludes)
 
         storeResult(jniType)

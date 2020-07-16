@@ -22,6 +22,7 @@ package com.here.gluecodium.generator.cpp
 import com.here.gluecodium.cli.GluecodiumExecutionException
 import com.here.gluecodium.generator.common.NameResolver
 import com.here.gluecodium.model.lime.LimeNamedElement
+import com.here.gluecodium.model.lime.LimeTypeRef
 
 /**
  * Auxiliary name resolver for the C++ generator. Resolves fully qualified names only.
@@ -30,6 +31,7 @@ internal class CppFullNameResolver(private val cachingNameResolver: CppNameResol
 
     override fun resolveName(element: Any): String =
         when (element) {
+            is LimeTypeRef -> cachingNameResolver.getFullyQualifiedName(element.type)
             is LimeNamedElement -> cachingNameResolver.getFullyQualifiedName(element)
             else ->
                 throw GluecodiumExecutionException("Unsupported element type ${element.javaClass.name}")

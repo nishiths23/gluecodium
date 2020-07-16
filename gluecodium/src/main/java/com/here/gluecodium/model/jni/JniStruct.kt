@@ -19,7 +19,7 @@
 
 package com.here.gluecodium.model.jni
 
-import com.here.gluecodium.generator.jni.JniNameRules
+import com.here.gluecodium.generator.jni.JniFileNameRules
 import com.here.gluecodium.model.java.JavaPackage
 
 class JniStruct(
@@ -40,5 +40,5 @@ class JniStruct(
 ) {
     @Suppress("unused")
     override val mangledName
-        get() = JniNameRules.getMangledName((javaPackage.packageNames + javaName).joinToString("/"))
+        get() = JniFileNameRules.getMangledName((javaPackage.packageNames + javaName).joinToString("/"))
 }

@@ -77,9 +77,9 @@ internal class CppGeneratorSuite(options: Gluecodium.Options) : GeneratorSuite {
         val nameResolver = Cpp2NameResolver(
             limeModel.referenceMap,
             internalNamespace,
+            cachingNameResolver,
             limeLogger,
-            commentsProcessor,
-            cachingNameResolver
+            commentsProcessor
         )
 
         val allErrorEnums = limeModel.topElements
