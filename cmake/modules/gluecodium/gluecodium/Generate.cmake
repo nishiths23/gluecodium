@@ -72,7 +72,7 @@ set(APIGEN_GLUECODIUM_DIR ${CMAKE_CURRENT_LIST_DIR})
 include(${APIGEN_GLUECODIUM_DIR}/GeneratedSources.cmake)
 
 function(apigen_generate)
-  set(options VALIDATE_ONLY VERBOSE STUBS)
+  set(options VALIDATE_ONLY STUBS)
   set(oneValueArgs TARGET GENERATOR VERSION
       ANDROID_MERGE_MANIFEST
       JAVA_PACKAGE
@@ -98,7 +98,6 @@ function(apigen_generate)
 
   _apigen_set_option(GENERATOR)
   _apigen_set_option(TARGET)
-  _apigen_set_option_or_default(VERBOSE OFF)
   _apigen_set_option_or_default(BUILD_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${APIGEN_TARGET}/build")
   _apigen_set_option_or_default(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${APIGEN_TARGET}/${APIGEN_GENERATOR}")
   _apigen_set_option_or_default(COMMON_OUTPUT_DIR "")

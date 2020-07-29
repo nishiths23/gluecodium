@@ -471,8 +471,7 @@ apigen_generate(TARGET hello
         INTERNAL_PREFIX "libhello_"
         DART_LIBRARY_NAME "hello"
         DART_NAMERULES "${CMAKE_CURRENT_SOURCE_DIR}/../config/dart.properties"
-        COPYRIGHT_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../config/COPYRIGHT"
-        VERBOSE)
+        COPYRIGHT_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../config/COPYRIGHT")
 apigen_target_include_directories(hello)
 apigen_target_sources(hello)
 
