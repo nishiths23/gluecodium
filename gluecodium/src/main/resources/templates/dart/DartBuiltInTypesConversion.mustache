@@ -180,7 +180,7 @@ final _{{this}}_get_value_nullable = __lib.nativeLibrary.lookupFunction<
     {{resolveName "FfiDartTypes"}} Function(Pointer<Void>)
   >('{{libraryName}}_{{this}}_get_value_nullable');
 
-Pointer<Void> {{this}}_toFfi_nullable({{resolveName}} value) {
+Pointer<Void> {{this}}_toFfi_nullable({{resolveName}}? value) {
   if (value == null) return Pointer<Void>.fromAddress(0);
   final _handle = {{#unless isNumericType}}{{this}}_toFfi{{/unless}}(value);
   final result = _{{this}}_create_handle_nullable(_handle);{{#unless isNumericType}}
@@ -188,7 +188,7 @@ Pointer<Void> {{this}}_toFfi_nullable({{resolveName}} value) {
   return result;
 }
 
-{{resolveName}} {{this}}_fromFfi_nullable(Pointer<Void> handle) {
+{{resolveName}}? {{this}}_fromFfi_nullable(Pointer<Void> handle) {
   if (handle.address == 0) return null;
   final _handle = _{{this}}_get_value_nullable(handle);
   final result = {{#unless isNumericType}}{{this}}_fromFfi{{/unless}}(_handle);{{#unless isNumericType}}
