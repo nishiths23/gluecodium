@@ -1,5 +1,9 @@
 # Gluecodium project Release Notes
 
+## Unreleased
+### Features
+  * Added `@Swift(Weak)` attributes for marking properties of interfaces as `weak` in Swift.
+
 ## 8.1.1
 Release date: 2020-08-13
 ### Features

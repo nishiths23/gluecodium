@@ -28,6 +28,7 @@ import com.here.gluecodium.model.lime.LimeAttributeType.EQUATABLE
 import com.here.gluecodium.model.lime.LimeAttributeType.POINTER_EQUATABLE
 import com.here.gluecodium.model.lime.LimeAttributeType.SWIFT
 import com.here.gluecodium.model.lime.LimeAttributeValueType
+import com.here.gluecodium.model.lime.LimeAttributeValueType.WEAK
 import com.here.gluecodium.model.lime.LimeBasicType
 import com.here.gluecodium.model.lime.LimeClass
 import com.here.gluecodium.model.lime.LimeConstant
@@ -159,6 +160,7 @@ class SwiftModelBuilder(
     private fun finishBuildingInterface(limeContainer: LimeInterface) {
         val parentClass =
             limeContainer.parent?.type?.let { buildTransientModel(it).first().classes.first() }
+        val isSwiftOnly = hasWeakProperties(limeContainer)
         val swiftClass = SwiftClass(
             nestedNames = nameResolver.getNestedNames(limeContainer),
             visibility = getVisibility(limeContainer),
@@ -169,7 +171,8 @@ class SwiftModelBuilder(
             functionTableName = CBridgeNameRules.getFunctionTableName(limeContainer),
             hasEquatableType = limeContainer.attributes.have(EQUATABLE),
             isObjcInterface = limeContainer.attributes.have(SWIFT, LimeAttributeValueType.OBJC),
-            hasTypeRepository = true
+            hasTypeRepository = !isSwiftOnly,
+            isSwiftOnly = isSwiftOnly
         )
         swiftClass.comment = createComments(limeContainer)
 
@@ -392,7 +395,8 @@ class SwiftModelBuilder(
             getter = getterMethod,
             setter = swiftSetter,
             isStatic = limeProperty.isStatic,
-            isCached = limeProperty.attributes.have(CACHED)
+            isCached = limeProperty.attributes.have(CACHED),
+            isWeak = limeProperty.attributes.have(SWIFT, WEAK)
         )
         property.comment = createComments(limeProperty)
 
@@ -488,5 +492,11 @@ class SwiftModelBuilder(
 
     companion object {
         const val PLATFORM_TAG = "Swift"
+
+        fun hasWeakProperties(limeContainer: LimeContainerWithInheritance): Boolean {
+            if (limeContainer.properties.any { it.attributes.have(SWIFT, WEAK) }) return true
+            val parentContainer = limeContainer.parent?.type?.actualType as? LimeContainerWithInheritance
+            return parentContainer != null && hasWeakProperties(parentContainer)
+        }
     }
 }

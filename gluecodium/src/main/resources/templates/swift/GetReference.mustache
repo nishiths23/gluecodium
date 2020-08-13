@@ -24,12 +24,14 @@ internal func getRef(_ ref: {{name}}?, owning: Bool = true) -> RefHolder {
         return RefHolder(0)
     }
 
+{{#unless isSwiftOnly}}
     if let instanceReference = reference as? NativeBase {
         let handle_copy = {{cInstance}}_copy_handle(instanceReference.c_handle)
         return owning
             ? RefHolder(ref: handle_copy, release: {{cInstance}}_release_handle)
             : RefHolder(handle_copy)
     }
+{{/unless}}
 
     var functions = {{functionTableName}}()
     functions.swift_pointer = Unmanaged<AnyObject>.passRetained(reference).toOpaque()

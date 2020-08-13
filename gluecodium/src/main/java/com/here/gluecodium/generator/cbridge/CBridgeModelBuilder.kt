@@ -94,6 +94,7 @@ class CBridgeModelBuilder(
         val functionTableName =
             (limeContainer as? LimeInterface)?.let { CBridgeNameRules.getFunctionTableName(it) }
 
+        val isSwiftOnly = SwiftModelBuilder.hasWeakProperties(limeContainer)
         val cInterface = CInterface(
             name = CBridgeNameRules.getInterfaceName(limeContainer),
             selfType = currentContext.currentResults.filterIsInstance<CppTypeInfo>().firstOrNull(),
@@ -106,8 +107,9 @@ class CBridgeModelBuilder(
             functionTableName = functionTableName,
             isEquatable = limeContainer.attributes.have(LimeAttributeType.EQUATABLE),
             isPointerEquatable = limeContainer.attributes.have(LimeAttributeType.POINTER_EQUATABLE),
-            hasTypeRepository = limeContainer is LimeInterface || parentClass != null ||
-                    limeContainer.visibility.isOpen
+            hasTypeRepository = !isSwiftOnly &&
+                    (limeContainer is LimeInterface || parentClass != null || limeContainer.visibility.isOpen),
+            isSwiftOnly = isSwiftOnly
         )
 
         if (limeContainer is LimeInterface) {

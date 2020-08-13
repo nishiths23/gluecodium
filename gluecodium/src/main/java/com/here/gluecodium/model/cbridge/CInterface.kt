@@ -37,7 +37,8 @@ class CInterface(
     val isEquatable: Boolean = false,
     val isPointerEquatable: Boolean = false,
     @Suppress("unused") val hasTypeRepository: Boolean = false,
-    @Suppress("unused") val isFunctionalInterface: Boolean = false
+    @Suppress("unused") val isFunctionalInterface: Boolean = false,
+    @Suppress("unused") val isSwiftOnly: Boolean = false
 
 ) : CElement(name) {
     // Tree sets to keep the order of includes consistent

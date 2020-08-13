@@ -23,6 +23,7 @@ void {{name}}_release_handle(_baseRef handle) {
     delete get_pointer<{{selfType.name}}>(handle);
 }
 
+{{#unless isSwiftOnly}}
 _baseRef {{name}}_copy_handle(_baseRef handle) {
     return handle
         ? reinterpret_cast<_baseRef>(checked_pointer_copy(*get_pointer<{{selfType.name}}>(handle)))
@@ -67,7 +68,7 @@ void* {{name}}_get_typed(_baseRef handle) {
 }
 {{/if}}
 
-{{/if}}
+{{/unless}}{{/if}}
 
 {{#hasEquatableType}}
 bool {{name}}_equal(_baseRef lhs, _baseRef rhs) {
@@ -95,9 +96,9 @@ uint64_t {{name}}_hash(_baseRef handle) {
 {{/methods}}{{/set}}
 {{/structs}}
 
-{{#functions}}
+{{#unless isSwiftOnly}}{{#functions}}
 {{>cbridge/FunctionDefinition}}
-{{/functions}}
+{{/functions}}{{/unless}}
 
 {{#isInterface}}
 {{>cbridge/CppProxy}}

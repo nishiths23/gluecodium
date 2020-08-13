@@ -69,10 +69,12 @@
 {{/methods}}
 }
 
+{{#unless isSwiftOnly}}
 internal class _{{simpleName}}: {{simpleName}} {
 
 {{>CommonClassParts}}
 }
+{{/unless}}
 {{/ClassWithProtocol}}{{!!
 
 }}{{+CommonClassParts}}{{!!

@@ -39,10 +39,10 @@ internal func getRef(_ ref: {{name}}?, owning: Bool = true) -> RefHolder {
 }
 {{/isInterface}}
 
-{{^useParentCInstance}}
+{{^useParentCInstance}}{{#unless isSwiftOnly}}
 extension {{implName}}: NativeBase {
     var c_handle: _baseRef { return c_instance }
-}{{/useParentCInstance}}{{!!
+}{{/unless}}{{/useParentCInstance}}{{!!
 
 }}{{#if hasEquatableType}}
 {{#if isInterface}}
@@ -71,10 +71,12 @@ internal func {{mangledName}}copyFromCType(_ handle: _baseRef) -> {{name}} {
         return re_constructed
     }
 {{/if}}
+{{#unless isSwiftOnly}}
     if let swift_pointer = {{cInstance}}_get_swift_object_from_wrapper_cache(handle),
         let re_constructed = Unmanaged<AnyObject>.fromOpaque(swift_pointer).takeUnretainedValue() as? {{name}} {
         return re_constructed
     }
+{{/unless}}
 {{#if hasTypeRepository}}
     if let swift_pointer = {{cInstance}}_get_typed({{cInstance}}_copy_handle(handle)),
         let typed = Unmanaged<AnyObject>.fromOpaque(swift_pointer).takeRetainedValue() as? {{name}} {
@@ -82,11 +84,13 @@ internal func {{mangledName}}copyFromCType(_ handle: _baseRef) -> {{name}} {
         return typed
     }
     fatalError("Failed to initialize Swift object")
-{{/if}}{{#unless hasTypeRepository}}
+{{/if}}{{#unless hasTypeRepository}}{{#if isSwiftOnly}}
+    fatalError("Failed to initialize Swift object")
+{{/if}}{{#unless isSwiftOnly}}
     let result = {{implName}}(c{{simpleName}}: {{cInstance}}_copy_handle(handle))
     {{cInstance}}_cache_swift_object_wrapper(handle, Unmanaged<AnyObject>.passUnretained(result).toOpaque())
     return result
-{{/unless}}
+{{/unless}}{{/unless}}
 }
 
 internal func {{mangledName}}moveFromCType(_ handle: _baseRef) -> {{name}} {
@@ -97,11 +101,13 @@ internal func {{mangledName}}moveFromCType(_ handle: _baseRef) -> {{name}} {
         return re_constructed
     }
 {{/if}}
+{{#unless isSwiftOnly}}
     if let swift_pointer = {{cInstance}}_get_swift_object_from_wrapper_cache(handle),
         let re_constructed = Unmanaged<AnyObject>.fromOpaque(swift_pointer).takeUnretainedValue() as? {{name}} {
         {{cInstance}}_release_handle(handle)
         return re_constructed
     }
+{{/unless}}
 {{#if hasTypeRepository}}
     if let swift_pointer = {{cInstance}}_get_typed(handle),
         let typed = Unmanaged<AnyObject>.fromOpaque(swift_pointer).takeRetainedValue() as? {{name}} {
@@ -109,11 +115,13 @@ internal func {{mangledName}}moveFromCType(_ handle: _baseRef) -> {{name}} {
         return typed
     }
     fatalError("Failed to initialize Swift object")
-{{/if}}{{#unless hasTypeRepository}}
+{{/if}}{{#unless hasTypeRepository}}{{#if isSwiftOnly}}
+    fatalError("Failed to initialize Swift object")
+{{/if}}{{#unless isSwiftOnly}}
     let result = {{implName}}(c{{simpleName}}: handle)
     {{cInstance}}_cache_swift_object_wrapper(handle, Unmanaged<AnyObject>.passUnretained(result).toOpaque())
     return result
-{{/unless}}
+{{/unless}}{{/unless}}
 }
 
 internal func {{mangledName}}copyFromCType(_ handle: _baseRef) -> {{name}}? {
